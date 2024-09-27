@@ -19,39 +19,24 @@ if (!fs.existsSync(downloadFolder)) {
 
 app.post("/download", async (req, res) => {
   console.log("Received download request")
-  const { links } = req.body
-  console.log(`Received ${links.length} links to download`)
+  const { link } = req.body
+  console.log(`Received link to download: ${link}`)
 
   try {
-    const downloadPromises = links.map(async (link, index) => {
-      console.log(`Starting download for link ${index + 1}: ${link}`)
-
-      const response = await axios({
-        method: "GET",
-        url: link,
-        responseType: "stream",
-      })
-
-      const fileName = path.basename(link)
-      const filePath = path.join(downloadFolder, fileName)
-
-      const writer = fs.createWriteStream(filePath)
-      response.data.pipe(writer)
-
-      return new Promise((resolve, reject) => {
-        writer.on("finish", () => {
-          console.log(`Finished downloading: ${fileName}`)
-          resolve()
-        })
-        writer.on("error", reject)
-      })
+    const response = await axios({
+      method: "GET",
+      url: link,
+      responseType: "stream",
     })
 
-    console.log("Starting concurrent downloads...")
-    await Promise.all(downloadPromises)
-    console.log("All downloads completed successfully")
+    const fileName = path.basename(link)
 
-    res.json({ success: true, downloadPath: downloadFolder })
+    // Set headers for file download
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`)
+    res.setHeader("Content-Type", "application/octet-stream")
+
+    // Pipe the file data directly to the response
+    response.data.pipe(res)
   } catch (error) {
     console.error("Download error:", error)
     res.status(500).json({ success: false, error: "Download failed" })
