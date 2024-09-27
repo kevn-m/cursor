@@ -7,7 +7,8 @@ function App() {
 
   const handleDownload = async (link) => {
     try {
-      const response = await fetch("/download", {
+      const apiUrl = import.meta.env.VITE_API_URL || "/download"
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
