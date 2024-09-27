@@ -7,7 +7,7 @@ function App() {
 
   const handleDownload = async (link) => {
     try {
-      const response = await fetch("http://cursor-delta.vercel.app/download", {
+      const response = await fetch("/download", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,11 +52,19 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setDownloadStatus("Downloading...")
+
     const linksArray = links.split("\n").filter((link) => link.trim() !== "")
+    console.log(`Sending ${linksArray.length} links to server for download`)
 
     for (const link of linksArray) {
-      setDownloadStatus(`Downloading: ${link}`)
-      await handleDownload(link)
+      try {
+        console.log(`Sending request to server for: ${link}`)
+        await handleDownload(link)
+      } catch (error) {
+        console.error("Error:", error)
+        setDownloadStatus(`Download failed for: ${link}`)
+      }
     }
 
     setDownloadStatus("All downloads completed")

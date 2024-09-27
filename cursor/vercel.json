@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "backend/server.js", "use": "@vercel/node" },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    { "src": "/download", "dest": "backend/server.js" },
+    { "src": "^/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "^/(.*)\\.(js|css|ico)$", "dest": "/$1.$2" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
