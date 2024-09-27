@@ -3,19 +3,13 @@ const cors = require("cors")
 const axios = require("axios")
 const fs = require("fs")
 const path = require("path")
+const os = require("os")
 
 const app = express()
 const port = process.env.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
-
-const downloadFolder = path.join(__dirname, "downloads")
-
-// Ensure the download folder exists
-if (!fs.existsSync(downloadFolder)) {
-  fs.mkdirSync(downloadFolder)
-}
 
 app.post("/download", async (req, res) => {
   console.log("Received download request")
@@ -41,8 +35,4 @@ app.post("/download", async (req, res) => {
     console.error("Download error:", error)
     res.status(500).json({ success: false, error: "Download failed" })
   }
-})
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`)
 })
